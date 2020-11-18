@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Galaxy Wars</title>
+    <link href="index.css" rel="stylesheet">
+</head>
+
+<body>
+    <div id="background" class="">
+        <h1>GALAXY WAR</h1>
+        <div id="intro">
+            <img src="img/alien1.png">
+            <p style="font-size: 50px;">Rules<p>
+            <p>Defeat your enemy in 90 seconds or the world gonna be destroyed</p>
+            <p>You only can shoot 5 times and the ammo will reload if the bullet hit an alien or get out from the zone</p>
+            <p>The red alien only have 1 lives, the blue aliens have 3 lives</p>
+            <p>Use the left and right arrow button to move</p>
+            <p>Use the space button to shoot</p>
+            <p style="font-size: 50px; margin-top: 30px;">Press Enter to Play</p>
+        </div>
+        <div id="bullets"></div>
+        <div id="ship"></div>
+        <div id="aliens"></div>
+    </div>
+    <div id="stats"></div>
+
+    <script>
+        function bigGame() {
+        let move = true;
+        let moveCount = 5;
+        let ship = {
+            top: 620,
+            left: 575
+        };
+        let timeplay = 0;
+        let bullets = [];
+        let leftBul = 5 - bullets.length;
+        let enemy = 24;
+        let alien1 = [
+            {top: 130, left: 225},
+            {top: 130, left: 325},
+            {top: 130, left: 425},
+            {top: 130, left: 525},
+            {top: 130, left: 625},
+            {top: 130, left: 725},
+            {top: 130, left: 825},
+            {top: 130, left: 925},
+            {top: 230, left: 225},
+            {top: 230, left: 325},
+            {top: 230, left: 425},
+            {top: 230, left: 525},
+            {top: 230, left: 625},
+            {top: 230, left: 725},
+            {top: 230, left: 825},
+            {top: 230, left: 925}
+        ];
+        let alien2 = [
+            {top: 30, left: 225, live: 2},
+            {top: 30, left: 325, live: 2},
+            {top: 30, left: 425, live: 2},
+            {top: 30, left: 525, live: 2},
+            {top: 30, left: 625, live: 2},
+            {top: 30, left: 725, live: 2},
+            {top: 30, left: 825, live: 2},
+            {top: 30, left: 925, live: 2}
+        ]
+
+        function addBullet() {
+            bullets.push({top: ship.top, left: ship.left + 20});
+        }
+
+        function drawGame() {
+            document.getElementById('bullets').innerHTML = '';
+            for (let i = 0; i < bullets.length; i++) {
+                document.getElementById('bullets').innerHTML += `<div id="bullet" style="top: ${bullets[i].top}px; left: ${bullets[i].left}px;"><div>`;
+            }
+
+            document.getElementById('aliens').innerHTML = '';
+            for (let i = 0; i < alien2.length; i++) {
+                document.getElementById('aliens').innerHTML += `<div id="alien2" style="top: ${alien2[i].top}px; left: ${alien2[i].left}px;"><div>`;
+            }
+            for (let i = 0; i < alien1.length; i++) {
+                document.getElementById('aliens').innerHTML += `<div id="alien1" style="top: ${alien1[i].top}px; left: ${alien1[i].left}px;"><div>`;
+            }
+        }
+
+        function moveBullets() {
+            for (let i = 0; i < bullets.length; i++) {
+                bullets[i].top -= 10;
+            }
+        }
+
+        function moveAlienDown() {
+            for (let i = 0; i < alien1.length; i++) {
+                alien1[i].top += 20;
+            }
+
+            for (let i = 0; i < alien2.length; i++) {
+                alien2[i].top += 20;
+            }
+
+            setTimeout(moveAlienDown, 8000);
+        }
+        moveAlienDown();
+
+        function moveAlienSide() {
+            if (moveCount == 10) {
+                move = false;
+            } else if (moveCount == 0) {
+                move = true;
+            }
+
+            if (move == true) {
+                for (let i = 0; i < alien1.length; i++) {
+                    alien1[i].left += 20;
+                }
+
+                for (let i = 0; i < alien2.length; i++) {
+                    alien2[i].left += 20;
+                }
+
+                moveCount += 1;
+            } else {
+                for (let i = 0; i < alien1.length; i++) {
+                    alien1[i].left -= 20;
+                }
+
+                for (let i = 0; i < alien2.length; i++) {
+                    alien2[i].left -= 20;
+                }
+
+                moveCount--;
+            }
+
+            setTimeout(moveAlienSide, 1000);
+        }
+        moveAlienSide();
+
+        function check() {
+            for (let i = 0; i < alien1.length; i++) {
+                for (let j = 0; j < bullets.length; j++) {
+                    if (bullets[j].top >= alien1[i].top && bullets[j].top <= alien1[i].top + 50 && bullets[j].left >= alien1[i].left && bullets[j].left <= alien1[i].left + 50) {
+                        alien1.splice(i, 1);
+                        bullets.splice(j, 1);
+                        enemy--;
+                    }
+                }
+            }
+
+            for (let i = 0; i < alien2.length; i++) {
+                for (let j = 0; j < bullets.length; j++) {
+                    if (bullets[j].top >= alien2[i].top && bullets[j].top <= alien2[i].top + 50 && bullets[j].left >= alien2[i].left && bullets[j].left <= alien2[i].left + 50) {
+                        alien2[i].live -= 1;
+                        bullets.splice(j, 1);
+                        if (alien2[i].live == 0) {
+                            alien2.splice(i, 1);
+                            enemy--;
+                        }
+                    }
+                }
+            }
+
+            for (let i = 0; i < bullets.length; i++) {
+                if (bullets[i].top < 0) {
+                    bullets.splice(i, 1);
+                }
+            }
+        }
+
+        function updateTime() {
+            setTimeout(updateTime, 1000);
+            timeplay++;
+        }
+        updateTime();
+
+        function updateBul() {
+            leftBul = 5 - bullets.length;
+            setTimeout(updateBul, 10); 
+        }
+        updateBul();
+
+        function result() {
+            if (timeplay == 90) {
+                document.getElementById('background').innerHTML = `<div id="lose"><h1>You Lose</h1><h2>Refresh to play again</h2></div>`
+            }
+            if (enemy == 0) {
+                document.getElementById('background').innerHTML = `<div id="win"><h1>You Win</h1><h2>Refresh to play again</h2></div>`
+            }
+        }
+       
+        function gamePlay() {
+            setTimeout(gamePlay, 100);
+            moveBullets();
+            drawGame();
+            check();
+            result();
+            document.getElementById('stats').innerHTML = `Enemies left: ${enemy}<br><br>Play Time: ${timeplay}<br><br>Bullets Left: ${leftBul}`;
+        }
+        gamePlay();
+
+        document.onkeydown = (e) => {
+            if (e.keyCode == 37) {
+                ship.left -= 10;
+                document.getElementById('ship').style.left = `${ship.left}px`;
+            } else if (e.keyCode == 39) {
+                ship.left += 10;
+                document.getElementById('ship').style.left = `${ship.left}px`;
+            } else if (e.keyCode == 32 && bullets.length < 5) {
+                addBullet();
+            }
+        }
+        }
+        let element = document.getElementById("intro");
+        document.onkeydown = (a) => {
+            if (a.keyCode == 13) {
+                element.classList.toggle("intro");
+                bigGame()
+            }
+        }
+    </script>
+</body>
+
+</html>
